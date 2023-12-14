@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>CS4406 Computer Graphics - Exercise #1</title>
+
+  <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script type="importmap">
+        {
+          "imports": {
+            "three": "https://unpkg.com/three@0.157/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.157/examples/jsm/"
+          }
+        }
+    </script>
+
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    #container {
+      background: #000;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+
+    // set the scene size
+    let WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
+
+    // set some camera attributes
+    let VIEW_ANGLE = 45, ASPECT = WIDTH / HEIGHT, NEAR = 1, FAR = 1000;
+
+    // get the DOM element to attach to
+    let $container = $('#container');
+
+    // create a WebGL renderer, camera, and a scene
+
+    let renderer = new THREE.WebGLRenderer();
+    let scene = new THREE.Scene();
+    let clock = new THREE.Clock();
+    let camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    // the camera starts at 0,0,0 so pull it back
+    camera.position.z = 200;
+    // add the camera to the scene
+    scene.add(camera)
+
+    // set up the camera controls.  Please keep in mind that what this does is move the entire scene around.
+    // because the entire scene is moving the position of the camera and lights in relation to objects within
+    // the scene doesn't change so the lighting on the surface of the object(s) will not change either
+    let cameraControls = new OrbitControls(camera, renderer.domElement);
+    cameraControls.addEventListener('mousemove', renderer);
+    cameraControls.autoRotate = true;
+
+    // start the renderer
+    renderer.setSize(WIDTH, HEIGHT);
+
+    // attach the render-supplied DOM element
+    $container.append(renderer.domElement);
+
+    // ----------------------------------------------------------------------------------------
+    //  END OF THE STANDARD CODE FOR THE ASSIGNMENT
+    //  Following this is where you must place your own custom code to complete the assignment
+    // ----------------------------------------------------------------------------------------
+
+    // soft white light
+    let ambientLight = new THREE.AmbientLight(0x404040, 20);
+    scene.add(ambientLight);
+
+    let pointLight = new THREE.PointLight(0xffffff, 2000, 10000);
+    pointLight.position.set(50, 50, 50); // Adjust this as needed
+    scene.add(pointLight);
+
+    // create the sphere's material
+    let sphereMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
+
+    // set up the sphere lets
+    let radius = 50, segments = 32, rings = 32;
+
+    // create a new mesh with sphere geometry -
+    // we will cover the sphereMaterial next!
+    let sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(radius, segments, rings),
+      sphereMaterial);
+
+    // add the sphere to the scene
+    scene.add(sphere);
+
+    // Standard functions for rendering the scene.  Notice how we have the animate function
+    // which submits a call to requestAnimationFrame to call animate.   This creates a loop
+    // that will render the scene again whenever something within the scene changes.
+    function animate() {
+      requestAnimationFrame(animate);
+      render();
+    }
+
+    function render() {
+      cameraControls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+
+</body>
+
+</html>
